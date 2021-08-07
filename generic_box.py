@@ -6,6 +6,7 @@ SIZE_INNER = [ 85, 40, 30 ]
 TOP_OVERLAP = 10
 SCREW_SIZE = 1.5
 SCREW_THREAD_SIZE = 1.0
+TOLE_MM = 0.2
 
 def create_hollow_box( size_in, thick, top_overlap, screw_size = None, screw_thread_size = None, scew_wall_thick = None ):
     thick_scalar = [2,2,1]
@@ -43,7 +44,7 @@ def create_hollow_box( size_in, thick, top_overlap, screw_size = None, screw_thr
         box_base = supalib.create_cut( box_base, screw_cuts )
         screw_cuts_top = supalib.create_union( screw_cuts_top )
 
-    top_size_in = [ s + thick*2 for s in size_in ]
+    top_size_in = [ s + thick*2 + TOLE_MM for s in size_in ]
     top_size_in[2] = top_overlap
     top_base, _top_out, _top_in = create_box_base(top_size_in, thick) 
     top_base = supalib.relocate( top_base, (-thick,-thick,0))
@@ -51,6 +52,13 @@ def create_hollow_box( size_in, thick, top_overlap, screw_size = None, screw_thr
     screw_cuts_top = supalib.relocate( screw_cuts_top, (0,0,-4*thick))
     top_base = supalib.create_cut( top_base, screw_cuts_top )
     top_base = supalib.relocate( top_base, place=(0,size_in[1] + 2*thick,size_in[2] + 2*thick), rotate=(1,0,0,180)) 
+    
+    hole_wire = supalib.create_cyl( screw_size, 20, place=(15,26,20))
+    top_base = supalib.create_cut( top_base, hole_wire)
+
+    hole_pipes = supalib.create_union( [supalib.create_cyl( 2.0, 20, place=(0, (48/3)*(loop+1), 0 )) for loop in range(2)] )
+    hole_pipes = supalib.relocate( hole_pipes, place=(-10,0,15), rotate=(0,1,0,90)) 
+    box_base = supalib.create_cut( box_base, hole_pipes)
     
     box_base.Label = "box_base"
     top_base.Label = "box_top"

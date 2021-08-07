@@ -1,3 +1,3 @@
 all:
-	pyflakes3  generic_box*.py
-	python3 freecad_eval.py generic_box.py
+	pyflakes3  model_*.py
+	python3 freecad_eval.py model_toy_volvo_spoler.py
